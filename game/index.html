@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Emberfall — Duel of the Four Winds</title>
+<link rel="stylesheet" href="css/table.css">
+<link rel="stylesheet" href="css/cards.css">
+</head>
+<body>
+<!-- Wind glyphs, drawn once and reused by every card and badge. Each Wind
+     has its own shape: flame, droplet, leaf, bolt. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="glyph-flame" viewBox="0 0 24 24">
+      <path d="M12 2 C13 6 17 7.5 17 12 a5 5 0 0 1 -10 0 C7 9 9 7.5 10 6 C10 8 11 9 11.5 9.5 C11.5 6.5 11 4 12 2 Z M12 20 a2.6 2.6 0 0 0 2.6 -2.6 C14.6 15.4 13.4 14.4 12 13.6 C10.6 14.4 9.4 15.4 9.4 17.4 A2.6 2.6 0 0 0 12 20 Z"/>
+    </symbol>
+    <symbol id="glyph-drop" viewBox="0 0 24 24">
+      <path d="M12 2 C12 2 5.5 10 5.5 14.5 a6.5 6.5 0 0 0 13 0 C18.5 10 12 2 12 2 Z M9.5 14.5 a2.5 2.5 0 0 0 2.5 2.5"/>
+    </symbol>
+    <symbol id="glyph-leaf" viewBox="0 0 24 24">
+      <path d="M20 4 C11 4 4 10 4 19 C4 20 4.5 20 5 20 C14 20 20 13 20 4 Z M6 18 C8 12 12 8 18 6"/>
+    </symbol>
+    <symbol id="glyph-bolt" viewBox="0 0 24 24">
+      <path d="M13 2 L4 13.5 L10.5 13.5 L9.5 22 L20 9.5 L13 9.5 Z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ============ TITLE ============ -->
+<section id="title-screen" class="screen">
+  <div class="title-inner">
+    <div class="title-kicker">A duel card game</div>
+    <h1 class="title-name">EMBERFALL</h1>
+    <div class="title-sub">Duel of the Four Winds</div>
+    <div id="title-fan" class="title-fan"></div>
+    <p class="title-blurb">Four Winds. One table. Reduce Vex, the Stormcaller, to 0 Life —<br>
+    ride the Rising Wind, chain Windfall combos, and strike when it counts.</p>
+    <div class="title-actions">
+      <button id="play-btn" class="btn btn-primary">Play the Duel</button>
+      <button id="howto-btn" class="btn btn-ghost">How to Play</button>
+    </div>
+    <div class="title-facts"><span>30 Life</span><i>•</i><span>24 Cards</span><i>•</i><span>4 Winds</span><i>•</i><span>1 Opponent</span></div>
+  </div>
+  <div id="howto" class="howto">
+    <div class="howto-panel">
+      <h2>How to Play</h2>
+      <ul>
+        <li><strong>Win</strong> by reducing Vex to 0 Life. Lose yours and the table is theirs.</li>
+        <li>Each turn you gain <strong>+1 mana</strong> (up to 10) and <strong>draw a card</strong>. Playing a card spends its cost.</li>
+        <li><strong>The Rising Wind:</strong> one Wind rises each turn — its cards cost 1 less.</li>
+        <li><strong>Windfall:</strong> play 2 cards of the same Wind in one turn to draw a card.</li>
+        <li><strong>Creatures</strong> stay on the table and attack from the turn after they arrive. Click one, then click Vex or a creature to strike. Both sides take damage in a fight; hitting the hero is free.</li>
+        <li><strong>Spells</strong> strike once. Some need a target — click the spell, then its victim.</li>
+        <li>An empty deck bites: drawing with no cards left deals rising fatigue damage.</li>
+      </ul>
+      <p class="howto-keys">Mouse to play · <strong>Space</strong> ends your turn · <strong>1–9</strong> play a hand card · <strong>Esc</strong> cancels</p>
+      <button id="howto-close" class="btn btn-primary">Got it</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TABLE ============ -->
+<section id="game-screen" class="screen">
+  <header class="table-header">
+    <div class="brand">EMBERFALL</div>
+    <div id="turn-label" class="turn-label">Round 1 — Your turn</div>
+    <div class="header-btns">
+      <button id="sound-btn" class="btn btn-small">Sound: on</button>
+      <button id="menu-btn" class="btn btn-small">Menu</button>
+    </div>
+  </header>
+
+  <div class="table">
+    <!-- Opponent -->
+    <div class="hero-row foe-row">
+      <div id="foe-hero" class="hero foe">
+        <div class="hero-portrait storm">V</div>
+        <div class="hero-info">
+          <div class="hero-name">Vex, the Stormcaller</div>
+          <div class="hero-bars">
+            <div class="life-wrap"><span class="heart">♥</span><span id="foe-life">30</span><div class="life-bar"><div id="foe-life-bar" class="life-fill"></div></div></div>
+            <div class="mana-wrap"><span class="crystal">◆</span><span id="foe-mana">0/0</span></div>
+          </div>
+        </div>
+      </div>
+      <div id="foe-hand" class="hand foe-hand"></div>
+      <div class="deck-pile"><div class="deck-back"></div><span>Deck <b id="foe-deck">20</b></span></div>
+    </div>
+
+    <div id="foe-board" class="board foe-board"></div>
+
+    <!-- Centre strip -->
+    <div class="centre-strip">
+      <div id="wind-badge" class="wind-badge wind-ember"></div>
+      <div id="hint" class="hint">Click a glowing card to play it.</div>
+      <button id="end-turn" class="btn btn-primary end-turn">End Turn</button>
+    </div>
+
+    <div id="you-board" class="board you-board"></div>
+
+    <!-- Player -->
+    <div class="hero-row you-row">
+      <div class="deck-pile"><div class="deck-back"></div><span>Deck <b id="you-deck">20</b></span></div>
+      <div id="you-hand" class="hand you-hand"></div>
+      <div id="you-hero" class="hero you">
+        <div class="hero-portrait ember">You</div>
+        <div class="hero-info">
+          <div class="hero-name">Duelist</div>
+          <div class="hero-bars">
+            <div class="life-wrap"><span class="heart">♥</span><span id="you-life">30</span><div class="life-bar"><div id="you-life-bar" class="life-fill"></div></div></div>
+            <div class="mana-wrap"><span class="crystal">◆</span><span id="you-mana">0/0</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <aside class="log-panel">
+    <h3>Duel Log</h3>
+    <ul id="log-list"></ul>
+  </aside>
+</section>
+
+<!-- ============ END ============ -->
+<section id="end-screen" class="screen">
+  <div class="end-inner">
+    <div id="end-title" class="end-title win">VICTORY</div>
+    <div id="end-subtitle" class="end-subtitle">The Four Winds bow to you, duelist.</div>
+    <div id="end-stats" class="end-stats"></div>
+    <button id="play-again-btn" class="btn btn-primary">Duel Again</button>
+  </div>
+</section>
+
+<div id="fx"></div>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
